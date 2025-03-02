@@ -1,11 +1,18 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-tech-filter',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './tech-filter.component.html',
   styleUrl: './tech-filter.component.css'
 })
 export class TechFilterComponent {
+  @Input() techList: { name: string; image: string }[] = []; // Array of techs with name and image
+  @Output() filterCourses = new EventEmitter<string>();
 
+  selectTechnology(tech: string) {
+    this.filterCourses.emit(tech);
+  }
+  
 }
