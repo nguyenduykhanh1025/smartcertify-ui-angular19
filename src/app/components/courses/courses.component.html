@@ -7,13 +7,12 @@
     <!-- Technology Filter -->
     <app-tech-filter [techList]="techData" (filterCourses)="onTechSelected($event)"></app-tech-filter>
 
-       <!-- Test Availability Toggle -->
-       <div class="d-flex justify-content-center align-items-center mt-3 mb-4">
+    <!-- Test Availability Toggle -->
+    <div class="d-flex justify-content-center align-items-center mt-3 mb-4">
         <label class="form-check-label me-2" for="toggleTests">Show Available Tests</label>
         <input type="checkbox" class="form-check-input" id="toggleTests" [(ngModel)]="onlyAvailableTest"
             (change)="applyFilters()" />
     </div>
-
 
     <!-- Courses List -->
     <div class="container py-4">
@@ -29,7 +28,8 @@
                         <p>There are {{course.questionCount}} questions to evaluate your knowledge.</p>
                     </div>
                     <div class="card-footer text-center">
-                        <button class="btn btn-primary" [disabled]="!course.questionCount">
+                        <button class="btn btn-primary" [disabled]="!userId || !course.questionCount"
+                            (click)="startTest(course.courseId)">
                             Start a Test
                         </button>
                     </div>

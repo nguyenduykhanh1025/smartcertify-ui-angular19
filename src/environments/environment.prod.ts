@@ -5,6 +5,8 @@
 import { EnvironmentConfiguration } from "../app/models/environment-configuration";
 
 
+
+
 const serverUrl='https://smartcertify-api.azurewebsites.net/api';
 
 
@@ -21,7 +23,7 @@ export const environment: EnvironmentConfiguration = {
       'https://smartlearnbykarthik.onmicrosoft.com/smartcertify/prod/api/User.Read',
       'https://smartlearnbykarthik.onmicrosoft.com/smartcertify/prod/api/User.Write'
     ],
-    apiEndpointUrl: serverUrl
+    apiEndpointUrl: 'https://smartcertify-api.azurewebsites.net/api'
   },
   cacheTimeInMinutes: 30,
 };

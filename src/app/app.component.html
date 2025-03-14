@@ -1,4 +1,14 @@
-<app-header></app-header>
+<div>
+    <app-header> </app-header>
+    
+    <!--This is to avoid reload during acquireTokenSilent() because of hidden iframe -->
+    @if (!isIframe) {
+    <div>
+        <router-outlet #outlet="outlet"></router-outlet>
+    </div>
 
-<router-outlet />
-<app-footer></app-footer>
+    }
+    <br>
+    <ngx-spinner></ngx-spinner>
+    <app-footer></app-footer>
+</div>
