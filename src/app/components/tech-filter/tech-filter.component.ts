@@ -9,10 +9,9 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class TechFilterComponent {
   @Input() techList: { name: string; image: string }[] = []; // Array of techs with name and image
-  @Output() filterCourses = new EventEmitter<string>();
+  @Output() filterCourses = new EventEmitter<string>(); // Emit selected tech name
 
-  selectTechnology(tech: string) {
-    this.filterCourses.emit(tech);
+  selectTechnology(tech: string): void {
+    this.filterCourses.emit(tech); // Emit selected tech to parent component
   }
-  
 }

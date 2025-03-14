@@ -6,6 +6,7 @@ import { EnvironmentConfiguration } from "../app/models/environment-configuratio
 
 
 
+
 const serverUrl='https://localhost:7209/api';
 //const serverUrl='https://smartcertify-api.azurewebsites.net/api';
 

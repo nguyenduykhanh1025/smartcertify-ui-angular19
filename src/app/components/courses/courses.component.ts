@@ -1,23 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Course } from '../../models/course';
 import { CoursesService } from '../../services/courses.service';
-import { CommonModule } from '@angular/common';
-import { TechFilterComponent } from "../tech-filter/tech-filter.component";
-import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { LoginService } from '../../services/login.service';
+import { TechFilterComponent } from '../tech-filter/tech-filter.component';
 
 @Component({
   selector: 'app-courses',
-  imports: [CommonModule, TechFilterComponent, FormsModule],
+  imports: [CommonModule, FormsModule, TechFilterComponent],
   templateUrl: './courses.component.html',
   styleUrl: './courses.component.css',
 })
-export class CoursesComponent implements OnInit {
+export class CoursesComponent {
   courses: Course[] = [];
-  filteredCourses: Course[] = [];
   onlyAvailableTest = false;
-
-  technologySelected : string='';
-
+  userId: number = 0;
+  technologySelected: string = 'Azure'; // Default selected technology
   techData = [
     { name: 'Angular', image: '../../../assets/technologies/angular.svg' },
     { name: 'React', image: '../../../assets/technologies/react.svg' },
@@ -39,19 +39,17 @@ export class CoursesComponent implements OnInit {
     { name: 'AWS', image: '../../../assets/technologies/aws.svg' },
     { name: 'Docker', image: '../../../assets/technologies/docker.svg' },
   ]; // List of technologies with names and images
-  
-  
-  constructor(private courseService: CoursesService) {}
- 
- 
+  filteredCourses: Course[] = [];
+
+  constructor(
+    private courseService: CoursesService,
+    private router: Router,
+    private loginService: LoginService
+  ) {}
+
   ngOnInit(): void {
     this.loadCourses();
-  }
-
-  loadCourses() {
-    this.courseService.getCourses().subscribe((courses) => {
-      this.courses = courses;
-    });
+    this.userId = this.loginService.userId;
   }
 
   onTechSelected(tech: string): void {
@@ -60,7 +58,7 @@ export class CoursesComponent implements OnInit {
     this.applyFilters();
   }
 
-  applyFilters() {
+  applyFilters(): void {
     // Base filter: Filter courses by selected technology
     let filtered = this.courses.filter((course) =>
       course.title
@@ -72,8 +70,43 @@ export class CoursesComponent implements OnInit {
     if (this.onlyAvailableTest) {
       filtered = filtered.filter((course) => course.questionsAvailable);
     }
-    
+
     this.filteredCourses = filtered;
   }
- 
+
+  getCoursesForTech(tech: string): Course[] {
+    return this.courses.filter((course) =>
+      course.title.toLocaleLowerCase().startsWith(tech.toLocaleLowerCase())
+    );
+  }
+
+  filterAvailableTests() {
+    if (this.onlyAvailableTest) {
+      this.filteredCourses = this.courses.filter(
+        (course) =>
+          course.questionsAvailable == this.onlyAvailableTest &&
+          course.title
+            .toLocaleLowerCase()
+            .startsWith(this.technologySelected.toLocaleLowerCase())
+      );
+    }
+  }
+
+  loadCourses(): void {
+    this.courseService.getAllCourses().subscribe((courses) => {
+      this.courses = courses;
+      this.applyFilters(); // Initialize filtered courses
+    });
+  }
+
+  startTest(courseId: number): void {
+    console.log(`Start test for course ID: ${courseId}`);
+
+    // Store data in session storage or local storage
+    sessionStorage.setItem('userId', this.userId.toString());
+    sessionStorage.setItem('courseId', courseId.toString());
+
+    // Navigate to the start-a-test route
+    this.router.navigate(['/exam/start']);
+  }
 }
