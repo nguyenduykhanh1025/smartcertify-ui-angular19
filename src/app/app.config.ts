@@ -44,6 +44,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpRequestInterceptor } from './services/spinner-interceptor';
 import { provideRouter } from '@angular/router';
+import { HttpErrorInterceptor } from './interceptors/http-error.service';
 
 export function loggerCallback(logLevel: LogLevel, message: string) {
   console.log(message);
@@ -261,6 +262,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
+    { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpRequestInterceptor,
