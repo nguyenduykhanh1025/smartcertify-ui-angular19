@@ -29,7 +29,12 @@
                     <a class="nav-link" [routerLink]="['/videos']" routerLinkActive="active"
                         [routerLinkActiveOptions]="{ exact: true }">Videos</a>
                 </li>
-
+                <!-- Update Profile -->
+                <li class="nav-item" *ngIf="loginDisplay">
+                    <a class="nav-link" [routerLink]="['/user/update-profile']"
+                        routerLinkActive="router-link-active">Update
+                        Profile</a>
+                </li>
                 <!-- Examples Dropdown -->
                 <!-- <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="coursesDropdown" role="button" data-bs-toggle="dropdown"
@@ -43,14 +48,16 @@
                     </ul>
                 </li> -->
                 @if(this.isAdmin){
-                    <li class="nav-item">
-                        <a class="nav-link" [routerLink]="['/admin/question/list']" routerLinkActive="active">View Questions</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" [routerLink]="['/admin/question/create']" routerLinkActive="active">Create Question</a>
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link" [routerLink]="['/admin/question/list']" routerLinkActive="active">View
+                        Questions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [routerLink]="['/admin/question/create']" routerLinkActive="active">Create
+                        Question</a>
+                </li>
                 }
-               
+
 
                 <!-- About and Contact -->
                 <li class="nav-item">
@@ -75,17 +82,15 @@
                 <li class="nav-item d-flex align-items-center">
                     <!-- Profile Picture -->
                     <img *ngIf="profilePictureUrl; else defaultAvatar" [src]="profilePictureUrl" alt="Profile Picture"
-                        class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" />
+                        (click)="editProfile()" class="rounded-circle"
+                        style="width: 40px; height: 40px; object-fit: cover; cursor: pointer;" />
 
                     <!-- Default Avatar -->
                     <ng-template #defaultAvatar>
-                        <img *ngIf="!loginDisplay" src="../../../../assets/images/default-avatar.png"
-                            alt="Default Avatar" class="rounded-circle "
-                            style="width: 40px; height: 40px; object-fit: cover;" />
+                        <a *ngIf="loginDisplay" title="Edit Profile"><i class="fa fa-user nav-link"></i></a>
                     </ng-template>
                     <a class="nav-link" *ngIf="!loginDisplay" (click)="loginRedirect()">Login</a>
-                    <a *ngIf="loginDisplay" (click)="editProfile()" title="Edit Profile"><i
-                            class="fa fa-user nav-link"></i></a>
+
                     <a class="nav-link" *ngIf="loginDisplay" (click)="logout()">Logout</a>
                 </li>
             </ul>

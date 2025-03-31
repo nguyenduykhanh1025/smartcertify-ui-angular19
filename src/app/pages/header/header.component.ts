@@ -1,21 +1,35 @@
 import { Component, Inject } from '@angular/core';
-import {  Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Subject, filter, takeUntil } from 'rxjs';
 
-import { MSAL_GUARD_CONFIG, MsalGuardConfiguration, MsalService, MsalBroadcastService } from '@azure/msal-angular';
-import { EventMessage,EventType, InteractionStatus, RedirectRequest, PopupRequest, AuthenticationResult, InteractionType } from '@azure/msal-browser';
+import {
+  MSAL_GUARD_CONFIG,
+  MsalGuardConfiguration,
+  MsalService,
+  MsalBroadcastService,
+} from '@azure/msal-angular';
+import {
+  EventMessage,
+  EventType,
+  InteractionStatus,
+  RedirectRequest,
+  PopupRequest,
+  AuthenticationResult,
+  InteractionType,
+} from '@azure/msal-browser';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Claim } from '../../models/claim';
 import { LoginService } from '../../services/login.service';
 import { b2cPolicies } from '../../app.config';
+import { UserProfileService } from '../../services/user-profile.service';
 
 @Component({
   selector: 'app-header',
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.css'
+  styleUrl: './header.component.css',
 })
 export class HeaderComponent {
   isIframe = false;
@@ -24,33 +38,42 @@ export class HeaderComponent {
   private readonly _destroying$ = new Subject<void>();
   claims: Claim[] = [];
   profilePictureUrl = '';
-  
+
   constructor(
     @Inject(MSAL_GUARD_CONFIG) private msalGuardConfig: MsalGuardConfiguration,
     private authService: MsalService,
     private msalBroadcastService: MsalBroadcastService,
     private loginService: LoginService,
-    private router: Router
+    private router: Router,
+    private userService: UserProfileService
   ) {}
 
   ngOnInit(): void {
-   
-    this.loginService.claims$.subscribe(s=>{
-      const roles = s.filter(f=>f.claim==='extension_userRoles');
-      if(roles.length && !this.isAdmin){
-        this.isAdmin = roles[0].value.split(',').filter((f) => f === 'Admin').length > 0
-      }      
-    });
-    
-    this.authService.handleRedirectObservable().subscribe((result: AuthenticationResult) => {
-      if (result) {
-        const redirectStartPage = localStorage.getItem('redirectStartPage'); // Retrieve the URL from local storage
-        if (redirectStartPage) {
-          this.router.navigate([redirectStartPage]);
-          localStorage.removeItem('redirectStartPage'); // Clear the URL from local storage
-        }
+    this.loginService.claims$.subscribe((s) => {
+      const roles = s.filter((f) => f.claim === 'extension_userRoles');
+
+      this.getUserInfo();
+      setInterval(() => {
+        this.getUserInfo();
+      }, 30000);
+
+      if (roles.length && !this.isAdmin) {
+        this.isAdmin =
+          roles[0].value.split(',').filter((f) => f === 'Admin').length > 0;
       }
     });
+
+    this.authService
+      .handleRedirectObservable()
+      .subscribe((result: AuthenticationResult) => {
+        if (result) {
+          const redirectStartPage = localStorage.getItem('redirectStartPage'); // Retrieve the URL from local storage
+          if (redirectStartPage) {
+            this.router.navigate([redirectStartPage]);
+            localStorage.removeItem('redirectStartPage'); // Clear the URL from local storage
+          }
+        }
+      });
 
     //this.authService.handleRedirectObservable().subscribe();
     this.isIframe = window !== window.parent && !window.opener; // Remove this line to use Angular Universal
@@ -92,10 +115,8 @@ export class HeaderComponent {
       });
   }
 
-
   setLoginDisplay() {
     this.loginDisplay = this.authService.instance.getAllAccounts().length > 0;
-   
   }
 
   checkAndSetActiveAccount() {
@@ -159,7 +180,7 @@ export class HeaderComponent {
 
     this.login(editProfileFlowRequest);
   }
-  
+
   login(userFlowRequest?: RedirectRequest | PopupRequest) {
     if (this.msalGuardConfig.interactionType === InteractionType.Popup) {
       if (this.msalGuardConfig.authRequest) {
@@ -189,9 +210,19 @@ export class HeaderComponent {
       }
     }
   }
-  
+
   ngOnDestroy(): void {
     this._destroying$.next(undefined);
     this._destroying$.complete();
+  }
+
+  getUserInfo() {
+    if (this.loginService.userId && this.loginService.userId > 0) {
+      this.userService
+        .getUserProfile(this.loginService.userId)
+        .subscribe((s) => {
+          this.profilePictureUrl = s.profileImageUrl ? s.profileImageUrl : '';
+        });
+    }
   }
 }

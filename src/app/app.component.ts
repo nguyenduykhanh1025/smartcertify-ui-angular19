@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { FooterComponent } from './pages/footer/footer.component';
 import { HeaderComponent } from './pages/header/header.component';
 import { NgxSpinnerComponent } from 'ngx-spinner';
+import { VideoScrollComponent } from "./components/video-scroll/video-scroll.component";
 
 @Component({
   selector: 'app-root',
